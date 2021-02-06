@@ -19,11 +19,7 @@ app.use(mongoSanitize({ replaceWith: "_" }));
 //const sauceRoutes = require('./routes/sauce'); // Sauce
 
 // Connection à la bdd
-mongoose.connect('mongodb+srv://user:phsm6ZnNiDYFdDzl@cluster0.dq28w.mongodb.net/groupomania?retryWrites=true&w=majority',
-    { useNewUrlParser: true,
-    useUnifiedTopology: true })
-        .then(() => console.log('Connexion à MongoDB réussie !'))
-        .catch(() => console.log('Connexion à MongoDB échouée !'));
+
 
 // Définition Headers
 app.use((req, res, next) => {
