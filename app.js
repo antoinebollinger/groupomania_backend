@@ -1,7 +1,5 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const mongoose = require('mongoose');
-const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const helmet = require("helmet");
 
@@ -11,15 +9,8 @@ const app = express();
 // Sécurisation avec le package Helmet
 app.use(helmet());
 
-// Protection contre les injections sur MongoDB
-app.use(mongoSanitize({ replaceWith: "_" }));
-
-// Appel des routes
-//const userRoutes = require('./routes/user'); // Utilisateur
-//const sauceRoutes = require('./routes/sauce'); // Sauce
-
-// Connection à la bdd
-
+// Utilisation de Body Parser
+app.use(bodyParser.json());
 
 // Définition Headers
 app.use((req, res, next) => {
@@ -29,15 +20,17 @@ app.use((req, res, next) => {
     next();
 });
 
-// Utilisation de Body Parser
-app.use(bodyParser.json());
-
 // Gestionnaire du dossier Images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// Définition des routes
-//app.use('/api/auth', userRoutes); // Utilisateurs
-//app.use('/api/sauces', sauceRoutes); // Sauces
+// ---------- Appel et définition des routes ----------------- //
+
+// Home : inscription et connection
+const authRoutes = require('./routes/auth');
+app.use('/api/auth', authRoutes);
+// User : gestion du profil de l'utilisateur
+const userRoutes = require('./routes/user');
+app.use('/api/user', userRoutes);
 
 // Export
 module.exports = app;
