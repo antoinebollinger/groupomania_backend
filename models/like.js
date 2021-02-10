@@ -1,14 +1,10 @@
-class User {
+class Post {
     constructor(options) {
         const defaults = {
             id: "",
-            email: "",
-            password: "",
-            firsName: "",
-            lastName: "",
-            imageUrl: "zero.png",
-            admin: false,
-            deleted: false
+            postId: "",
+            userId: "",
+            value: 1,
         };
         const populated = Object.assign(defaults, options);
         for (const key in populated) {
@@ -19,4 +15,4 @@ class User {
     }
 }
 
-module.exports = User;
+module.exports = Post;

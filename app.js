@@ -25,12 +25,15 @@ app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // ---------- Appel et définition des routes ----------------- //
 
-// Home : inscription et connection
+// Auth : inscription et connection
 const authRoutes = require('./routes/auth');
 app.use('/api/auth', authRoutes);
 // User : gestion du profil de l'utilisateur
 const userRoutes = require('./routes/user');
 app.use('/api/user', userRoutes);
+// Post : gestion des posts
+const postRoutes = require('./routes/post');
+app.use('/api/post', postRoutes);
 
 // Export
 module.exports = app;

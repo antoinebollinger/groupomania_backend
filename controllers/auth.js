@@ -5,15 +5,14 @@ const bdd = require("../bdd");
 
 exports.signup = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
-    const userImage = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "zero.png";
-    console.log(userObject);
-    bdd.promise("SELECT COUNT(id) AS user_exists FROM users WHERE email=? LIMIT 1;", [userObject.email])
+    const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : `${req.protocol}://${req.get('host')}/images/user.png`;
+    bdd.promise("SELECT id FROM users WHERE email=? LIMIT 1;", [userObject.email])
     .then(result => {
-        if (result[0].user_exists == 0) {
+        if (result.length == 0) {
             bcrypt.hash(userObject.password, 10) 
             .then(hash => {
-                const query_insert = "INSERT INTO users (email, password, firstName, lastName, image, admin) VALUES (?, ?, ?, ?, ?, ?)";
-                const query_params = [userObject.email, hash, userObject.firstName, userObject.lastName, userImage, userObject.admin];
+                const query_insert = "INSERT INTO users (email, password, firstName, lastName, imageUrl, admin) VALUES (?, ?, ?, ?, ?, ?)";
+                const query_params = [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl, userObject.admin];
                 bdd.promise(query_insert, query_params, "Impossible de créer le compte.")
                 .then(() => res.status(201).json({ message: "Compte créé avec succès." }))
                 .catch(error => res.status(500).json({ message: ""+error }));
@@ -44,7 +43,7 @@ exports.login = (req, res, next) => {
                         ),
                         firstName: result[0].firstName,
                         lastName: result[0].lastName,
-                        image: result[0].image,
+                        imageUrl: result[0].image,
                         admin: (result[0].admin == 0) ? false : true
                     });
                 }
