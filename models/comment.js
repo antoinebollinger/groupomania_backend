@@ -1,10 +1,10 @@
-class Like {
+class Comment {
     constructor(options) {
         const defaults = {
             id: "",
             postId: "",
             userId: "",
-            value: 1,
+            content: "",
         };
         const populated = Object.assign(defaults, options);
         for (const key in populated) {
@@ -15,4 +15,4 @@ class Like {
     }
 }
 
-module.exports = Like;
+module.exports = Comment;

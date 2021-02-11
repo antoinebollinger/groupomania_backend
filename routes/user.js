@@ -10,8 +10,8 @@ const userCtrl = require('../controllers/user');
 
 // Routage des controleurs
 router.get('/', auth, userCtrl.getAllUsers);
-router.get('/:id', auth, userCtrl.getOneUser);
-router.put('/:id', auth, multer, userCtrl.updateUser);
-router.delete('/:id', auth, multer, userCtrl.deleteUser);
+router.get('/:userId', auth, userCtrl.getOneUser);
+router.put('/:currentUserId', auth, multer, userCtrl.updateUser);
+router.delete('/:currentUserId', auth, multer, userCtrl.deleteUser);
 
 module.exports = router;

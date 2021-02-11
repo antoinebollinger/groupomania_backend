@@ -1,11 +1,11 @@
 const bcrypt = require('bcrypt');
-//const User = require('../models/user');
+const User = require('../models/user');
 const bdd = require("../bdd");
 const fs = require('fs');
 
 exports.updateUser = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
-    bdd.promise("SELECT password, imageUrl FROM users WHERE id=? LIMIT 1", [req.params.id])
+    bdd.promise("SELECT password, imageUrl FROM users WHERE id=? LIMIT 1", [req.params.currentUserid])
     .then(result => {
         if (result.length > 0) {
             if (req.file && `${req.protocol}://${req.get('host')}/images/${req.file.filename}` != result[0].imageUrl) {
@@ -15,7 +15,7 @@ exports.updateUser = (req, res, next) => {
                 }
             }
             const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
-            bdd.promise("UPDATE users SET email=?, firstName=?, lastname=?, imageUrl=? WHERE id=?", [userObject.email, userObject.firstName, userObject.lastName, userImageUrl, req.params.id])
+            bdd.promise("UPDATE users SET email=?, firstName=?, lastname=?, imageUrl=? WHERE id=?", [userObject.email, userObject.firstName, userObject.lastName, userImageUrl, req.params.currentUserid])
             .then(() => res.status(201).json({ message: "Compte modifié avec succès." }))
             .catch(error => res.status(500).json({ message: ""+error }));
 
@@ -27,7 +27,7 @@ exports.updateUser = (req, res, next) => {
 };
 
 exports.deleteUser = (req, res, next) => {
-    bdd.promise("SELECT password, imageUrl FROM users WHERE id=? LIMIT 1", [req.params.id])
+    bdd.promise("SELECT password, imageUrl FROM users WHERE id=? LIMIT 1", [req.params.currentUserid])
     .then(result => {
         if (result.length > 0) {
             bcrypt.compare(req.body.password, result[0].password)
@@ -39,7 +39,7 @@ exports.deleteUser = (req, res, next) => {
                     if (filename != 'user.png') {
                         fs.unlink(`images/${filename}`,() => {});
                     }
-                    bdd.promise("DELETE FROM users WHERE id=? && email=?", [req.params.id, req.body.email])
+                    bdd.promise("DELETE FROM users WHERE id=? && email=?", [req.params.currentUserid, req.body.email])
                     .then(() => res.status(201).json({ message: "Compte supprimé avec succès." }))
                     .catch(error => res.status(500).json({ message: ""+error }));
                 }
@@ -53,7 +53,7 @@ exports.deleteUser = (req, res, next) => {
 };
 
 exports.getOneUser = (req, res, next) => {
-    bdd.promise("SELECT firstName, lastName, imageUrl FROM users WHERE id = ?", [req.params.id], "Impossible d'afficher l'utilisateur demandé.")
+    bdd.promise("SELECT firstName, lastName, imageUrl FROM users WHERE id = ?", [req.params.userId], "Impossible d'afficher l'utilisateur demandé.")
     .then(user => res.status(200).json(user))
     .catch(error => res.status(400).json({ message: ""+error }));
 };

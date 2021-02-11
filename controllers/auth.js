@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt');
-//const User = require('../models/user');
+const User = require('../models/user');
 const jwt = require('jsonwebtoken');
 const bdd = require("../bdd");
 
@@ -35,7 +35,7 @@ exports.login = (req, res, next) => {
                     return res.status(401).json({ message: "Mot de passe incorrect !" });
                 } else {
                     res.status(200).json({
-                        userId: result[0].id,
+                        currentUserId: result[0].id,
                         token: jwt.sign(
                             {userId: result[0].id},
                             'RANDOM_TOKEN_SECRET',
