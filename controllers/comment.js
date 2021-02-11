@@ -8,7 +8,7 @@ exports.createComment = (req, res, next) => {
 };
 
 exports.getAllComments = (req, res, next) => {
-    bdd.promise("SELECT u.firstName, u.lastName, c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id",[], "Impossible d'afficher les commentaires.")
+    bdd.promise("SELECT COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=?",[req.params.postId], "Impossible d'afficher les commentaires.")
     .then(comments => res.status(200).json(comments))
     .catch(error => res.status(400).json({ message: ""+error }));
 };
