@@ -1,5 +1,5 @@
 const Post = require('../models/post');
-const bdd = require("../bdd");
+const bdd = require("../bdd/bdd");
 const fs = require('fs');
 
 exports.createPost = (req, res, next) => {

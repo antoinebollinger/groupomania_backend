@@ -11,5 +11,6 @@ const authCtrl = require('../controllers/auth');
 // Routage des controleurs
 router.post('/signup', multer, authCtrl.signup);
 router.post('/login', authCtrl.login);
+router.get('/logout', authCtrl.logout);
 
 module.exports = router;

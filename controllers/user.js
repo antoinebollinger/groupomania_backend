@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
-const bdd = require("../bdd");
+const bdd = require("../bdd/bdd");
 const fs = require('fs');
 
 exports.updateUser = (req, res, next) => {

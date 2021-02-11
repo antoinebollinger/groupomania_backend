@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
-const bdd = require("../bdd");
+const bdd = require("../bdd/bdd");
 
 exports.signup = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
@@ -54,4 +54,8 @@ exports.login = (req, res, next) => {
         }
     })
     .catch(error => res.status(500).json({ message: ""+error }));
+};
+
+exports.logout = (req, res, next) => {
+    return res.status(200).json({ message: "Vous devriez être déconnecté et redirigé vers la page d'accueil."});
 };

@@ -1,0 +1,8 @@
+{
+  "tables": {
+    "users": "CREATE TABLE IF NOT EXISTS `users` (`id` int(11) NOT NULL AUTO_INCREMENT,`email` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,`password` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,`firstName` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',`lastName` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',`imageUrl` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT 'user.png',`admin` tinyint(1) DEFAULT 0,`deleted` tinyint(1) DEFAULT 0,PRIMARY KEY (`id`),UNIQUE KEY `email` (`email`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
+    "posts": "CREATE TABLE IF NOT EXISTS `posts` (`id` int(11) NOT NULL AUTO_INCREMENT,`userId` int(11) NOT NULL,`content` text COLLATE utf8_unicode_ci NOT NULL DEFAULT '',`imageUrl` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',`postDate` timestamp NOT NULL DEFAULT current_timestamp(),PRIMARY KEY (`id`),KEY `userId` (`userId`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
+    "likes": "CREATE TABLE IF NOT EXISTS `likes` (`id` int(11) NOT NULL AUTO_INCREMENT,`postId` int(11) NOT NULL,`userId` int(11) NOT NULL,`value` float NOT NULL,PRIMARY KEY (`id`),KEY `postId` (`postId`,`userId`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci",
+    "comments": "CREATE TABLE IF NOT EXISTS `comments` (`id` int(11) NOT NULL AUTO_INCREMENT,`postId` int(11) NOT NULL,`userId` int(11) NOT NULL,`content` text COLLATE utf8_unicode_ci NOT NULL,`commentDate` timestamp NULL DEFAULT current_timestamp(),PRIMARY KEY (`id`),KEY `postId` (`postId`,`userId`)) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"
+  }
+}
