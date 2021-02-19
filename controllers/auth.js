@@ -11,18 +11,18 @@ exports.signup = (req, res, next) => {
         if (result.length == 0) {
             bcrypt.hash(userObject.password, 10) 
             .then(hash => {
-                const query_insert = "INSERT INTO users (email, password, firstName, lastName, imageUrl, admin) VALUES (?, ?, ?, ?, ?, ?)";
-                const query_params = [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl, userObject.admin];
+                const query_insert = "INSERT INTO users (email, password, firstName, lastName, imageUrl) VALUES (?, ?, ?, ?, ?)";
+                const query_params = [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl];
                 bdd.promise(query_insert, query_params, "Impossible de créer le compte.")
                 .then(() => res.status(201).json({ message: "Compte créé avec succès." }))
-                .catch(error => res.status(500).json({ message: ""+error }));
+                .catch(error => res.status(500).json({ error }));
             })
-            .catch(error => res.status(500).json({ message: ""+error }));
+            .catch(error => res.status(500).json({ error }));
         } else {
-            throw new Error("Cet email est déjà associé à un compte.");
+            return res.status(401).json({ message: "Cet email est déjà associé à un compte." });
         }
     })
-    .catch(error => res.status(500).json({ message: ""+error }));
+    .catch(error => res.status(500).json({ error }));
 };
 
 exports.login = (req, res, next) => {
@@ -48,12 +48,12 @@ exports.login = (req, res, next) => {
                     });
                 }
             })
-            .catch(error => res.status(500).json({ message: ""+error }));
+            .catch(error => res.status(500).json({ error }));
         } else {
             return res.status(401).json({ message: "Aucun compte n'est associé à cet email." });
         }
     })
-    .catch(error => res.status(500).json({ message: ""+error }));
+    .catch(error => res.status(500).json({ error }));
 };
 
 exports.logout = (req, res, next) => {
