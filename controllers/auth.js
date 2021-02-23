@@ -32,7 +32,7 @@ exports.login = (req, res, next) => {
             bcrypt.compare(req.body.password, result[0].password)
             .then(valid => {
                 if (!valid) {
-                    return res.status(401).json({ message: "Mot de passe incorrect !" });
+                    return res.status(401).json({ objet: "password", message: "Mot de passe incorrect !" });
                 } else {
                     res.status(200).json({
                         currentUserId: result[0].id,
@@ -43,14 +43,14 @@ exports.login = (req, res, next) => {
                         ),
                         firstName: result[0].firstName,
                         lastName: result[0].lastName,
-                        imageUrl: result[0].image,
+                        imageUrl: result[0].imageUrl,
                         admin: (result[0].admin == 0) ? false : true
                     });
                 }
             })
             .catch(error => res.status(500).json({ error }));
         } else {
-            return res.status(401).json({ message: "Aucun compte n'est associé à cet email." });
+            return res.status(401).json({ objet: "email", message: "Aucun compte n'est associé à cet email." });
         }
     })
     .catch(error => res.status(500).json({ error }));
