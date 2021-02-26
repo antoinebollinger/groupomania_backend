@@ -41,7 +41,7 @@ server.on('error', errorHandler);
 server.on('listening', () => {
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
-  console.log('APP runing at:')
+  console.log('API runing at:')
   console.log('- Local:    ' + '\u001b[34m' + 'http://localhost:' + port + '\u001b[0m');
   console.log('- Network:  ' + '\u001b[34m' + 'http://192.168.1.24:' + port + '\u001b[0m');
   
