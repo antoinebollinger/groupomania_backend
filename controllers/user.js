@@ -39,8 +39,12 @@ exports.deleteUser = (req, res, next) => {
                     if (filename != 'user.png') {
                         fs.unlink(`images/${filename}`,() => {});
                     }
-                    bdd.promise("DELETE FROM users WHERE id=? && email=?", [req.params.currentUserId, req.body.email])
-                    .then(() => res.status(201).json({ message: "Votre compte a bien été supprimé." }))
+                    let query = (req.body.deletePosts) ? 'DELETE FROM users WHERE id=? && email=?; DELETE FROM posts WHERE userId = ?; DELETE FROM likes WHERE userId = ?; DELETE FROM comments WHERE userId = ?': 'DELETE FROM users WHERE id=? && email=?';
+                    let queryParams = (req.body.deletePosts) ? [req.params.currentUserId, req.body.email, req.params.currentUserId, req.params.currentUserId, req.params.currentUserId] : [req.params.currentUserId, req.body.email] ;
+                    let queryMessage = (req.body.deletePosts) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés." : "Votre compte a bien été supprimé." ;
+                    console.log(query);
+                    bdd.promise(query, queryParams)
+                    .then(() => res.status(201).json({ message: queryMessage }))
                     .catch(error => res.status(500).json({ error }));
                 }
             })

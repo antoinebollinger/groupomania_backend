@@ -16,10 +16,16 @@ exports.createComment = (req, res, next) => {
 };
 
 exports.getAllComments = (req, res, next) => {
-    bdd.promise("SELECT COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', u.imageUrl AS 'image',c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=?",[req.params.postId], "Impossible d'afficher les commentaires.")
+    bdd.promise("SELECT c.id, c.postId, c.userId, COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', u.imageUrl AS 'userImage',c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=? ORDER BY c.commentDate ASC",[req.params.postId], "Impossible d'afficher les commentaires.")
     .then(comments => res.status(200).json(comments))
     .catch(error => res.status(400).json({ message: ""+error }));
 };
+
+exports.updateComment = (req, res, next) => {
+    bdd.promise("UPDATE comments SET content = ? WHERE id = ? && userId = ? && postId = ?", [req.body.content, req.params.commentId, req.body.currentUserId, req.params.postId])
+    .then(() => res.status(201).json({ message: "Commentaire modifié avec succès." }))
+    .catch(error => res.status(500).json({ error }));
+}; 
 
 exports.deleteComment = (req, res, next) => {
     const queryFilter = (req.body.admin) ? "" : " && userId=?" ;
