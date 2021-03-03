@@ -39,12 +39,30 @@ exports.deleteUser = (req, res, next) => {
                     if (filename != 'user.png') {
                         fs.unlink(`images/${filename}`,() => {});
                     }
-                    let query = (req.body.deletePosts) ? 'DELETE FROM users WHERE id=? && email=?; DELETE FROM posts WHERE userId = ?; DELETE FROM likes WHERE userId = ?; DELETE FROM comments WHERE userId = ?': 'DELETE FROM users WHERE id=? && email=?';
-                    let queryParams = (req.body.deletePosts) ? [req.params.currentUserId, req.body.email, req.params.currentUserId, req.params.currentUserId, req.params.currentUserId] : [req.params.currentUserId, req.body.email] ;
+                    let query = (req.body.deletePosts) ? 'DELETE u, p, l, c FROM users u INNER JOIN posts p ON p.userId = u.id INNER JOIN likes l ON l.userId = u.id INNER JOIN comments c ON c.userId = u.id WHERE u.id = ? && u.email = ?' : 'DELETE FROM users WHERE id=? && email=?';
+                    let queryParams = [req.params.currentUserId, req.body.email] ;
                     let queryMessage = (req.body.deletePosts) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés." : "Votre compte a bien été supprimé." ;
-                    console.log(query);
                     bdd.promise(query, queryParams)
-                    .then(() => res.status(201).json({ message: queryMessage }))
+                    .then(() => {
+                        if (req.body.deletePosts) {
+                            bdd.promise("SELECT imageUrl FROM posts WHERE userId = ?", [req.params.currentUserId])
+                            .then(result => {
+                                result.forEach(element => {
+                                    console.log(element.imageUrl);
+                                    let fileUrl = element.imageUrl.split('/images/')[1]
+                                    if (fileUrl != 'user.png') {
+                                        fs.unlink(`images/${fileUrl}`,() => {});
+                                    }
+                                });
+                                return res.status(201).json({ message: queryMessage })
+                            })
+                            .catch(error => {
+                                console.log(error);
+                            })
+                        } else {
+                            return res.status(201).json({ message: queryMessage })
+                        }
+                    })
                     .catch(error => res.status(500).json({ error }));
                 }
             })
