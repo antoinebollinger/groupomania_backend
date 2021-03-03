@@ -41,38 +41,28 @@ exports.updateUser = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
     bdd.promise(queries.delete.check, [req.params.currentUserId, req.body.email])
     .then(result => {
+        let imgToDelete = [result[0].imgProfil];
+        if (req.body.deleteDatas) {
+            result.forEach(element => {
+                imgToDelete.push(element.imgPosts);
+            });
+        }
         if (result.length > 0) {
             bcrypt.compare(req.body.password, result[0].password)
             .then(valid => {
                 if (!valid) {
                     return res.status(401).json({ message: "Mot de passe incorrect !" });
                 } else {
-                    const filename = result[0].imageUrl.split('/images/')[1];
-                    if (filename != 'user.png') {
-                        fs.unlink(`images/${filename}`,() => {});
-                    }
-                    let query = (req.body.deletePosts) ? queries.delete.delete.userAndDatas : queries.delete.delete.onlyUser ;
-                    let queryParams = [req.params.currentUserId, req.body.email] ;
-                    let queryMessage = (req.body.deletePosts) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés." : "Votre compte a bien été supprimé." ;
-                    bdd.promise(query, queryParams)
-                    .then(() => {
-                        if (req.body.deletePosts) {
-                            bdd.promise(queries.delete.delete.images, [req.params.currentUserId])
-                            .then(result => {
-                                result.forEach(element => {
-                                    console.log(element.imageUrl);
-                                    let fileUrl = element.imageUrl.split('/images/')[1]
-                                    if (fileUrl != 'user.png') {
-                                        fs.unlink(`images/${fileUrl}`,() => {});
-                                    }
-                                });
-                                return res.status(201).json({ message: queryMessage })
-                            })
-                            .catch(error => res.status(500).json({ error }));
-                        } else {
-                            return res.status(201).json({ message: queryMessage })
-                        }
+                    imgToDelete.forEach(element => {
+                        let filename = element.split('/images/')[1]
+                        if (filename != 'user.png') {
+                            fs.unlink(`images/${filename}`,() => {});
+                        }              
                     })
+                    let query = (req.body.deleteDatas) ? queries.delete.delete.userAndDatas : queries.delete.delete.onlyUser ;
+                    let queryMessage = (req.body.deleteDatas) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés." : "Votre compte a bien été supprimé." ;
+                    bdd.promise(query, [req.params.currentUserId, req.body.email])
+                    .then(() => res.status(201).json({ message: queryMessage }))
                     .catch(error => res.status(500).json({ error }));
                 }
             })
