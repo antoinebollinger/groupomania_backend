@@ -41,12 +41,13 @@ exports.updateUser = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
     bdd.promise(queries.delete.check, [req.params.currentUserId, req.body.email])
     .then(result => {
-        let imgToDelete = [result[0].imgProfil];
-        if (req.body.deleteDatas) {
-            result.forEach(element => {
+        let imgToDelete = [result[0].imgProfil];   
+        result.forEach(element => {
+            if (req.body.deleteDatas && element.imgPosts != '') {
                 imgToDelete.push(element.imgPosts);
-            });
-        }
+            }
+        });
+        console.log(imgToDelete);
         if (result.length > 0) {
             bcrypt.compare(req.body.password, result[0].password)
             .then(valid => {

@@ -6,7 +6,7 @@
         "update": "UPDATE users SET email=?, firstName=?, lastname=?, imageUrl=? WHERE id=?"
     },
     "delete": {
-        "check": "SELECT u.password, u.imageUrl AS 'imgProfil', p.imageUrl AS 'imgPosts' FROM users u JOIN posts p ON p.userId = u.id WHERE u.id=? && u.email=?",
+        "check": "SELECT u.password, u.imageUrl AS 'imgProfil', COALESCE(p.imageUrl,'') AS 'imgPosts' FROM users u LEFT JOIN posts p ON p.userId = u.id WHERE u.id=? && u.email=?",
         "delete": {
             "onlyUser": "DELETE FROM users WHERE id=? && email=?",
             "userAndDatas": "DELETE u, p, l, c FROM users u LEFT JOIN posts p ON p.userId = u.id LEFT JOIN likes l ON l.userId = u.id LEFT JOIN comments c ON c.userId = u.id WHERE u.id = ? && u.email = ?",
