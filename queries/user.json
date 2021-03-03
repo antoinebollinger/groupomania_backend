@@ -1,0 +1,16 @@
+{
+    "getOne": "SELECT firstName, lastName, imageUrl FROM users WHERE id = ?",
+    "getAll": "SELECT id, firstName, lastName, imageUrl FROM users",
+    "update": {
+        "check": "SELECT imageUrl FROM users WHERE id=?",
+        "update": "UPDATE users SET email=?, firstName=?, lastname=?, imageUrl=? WHERE id=?"
+    },
+    "delete": {
+        "check": "SELECT password, imageUrl FROM users WHERE id=? && email=? LIMIT 1",
+        "delete": {
+            "onlyUser": "DELETE FROM users WHERE id=? && email=?",
+            "userAndDatas": "DELETE u, p, l, c FROM users u INNER JOIN posts p ON p.userId = u.id INNER JOIN likes l ON l.userId = u.id INNER JOIN comments c ON c.userId = u.id WHERE u.id = ? && u.email = ?",
+            "images": "SELECT imageUrl FROM posts WHERE userId = ?"
+        }
+    }
+}

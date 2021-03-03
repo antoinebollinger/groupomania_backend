@@ -1,8 +1,8 @@
-const bcrypt = require('bcrypt');
-const User = require('../models/user');
-const jwt = require('jsonwebtoken');
 const bdd = require("../bdd/bdd");
+const queries = require('../queries/auth.json');
 const checkFunctions = require("../middleware/functions");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 exports.signup = (req, res, next) => {
     const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : `${req.protocol}://${req.get('host')}/images/user.png`;
@@ -27,14 +27,12 @@ exports.signup = (req, res, next) => {
     }
     const goSignup = checkFunctions.checkForm(userObjectTest);
     if (goSignup.valid) {
-        bdd.promise("SELECT id FROM users WHERE email=? LIMIT 1;", [userObject.email])
+        bdd.promise(queries.signup.check, [userObject.email])
         .then(result => {
             if (result.length == 0) {
                 bcrypt.hash(userObject.password, 10) 
                 .then(hash => {
-                    const query_insert = "INSERT INTO users (email, password, firstName, lastName, imageUrl) VALUES (?, ?, ?, ?, ?)";
-                    const query_params = [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl];
-                    bdd.promise(query_insert, query_params, "Impossible de créer le compte.")
+                    bdd.promise(queries.signup.insert, [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl], "Impossible de créer le compte.")
                     .then(() => res.status(201).json({ message: "Compte créé avec succès." }))
                     .catch(error => res.status(500).json({ error }));
                 })
@@ -62,7 +60,7 @@ exports.login = (req, res, next) => {
     }
     const goLogin = checkFunctions.checkForm(userObjectTest);
     if (goLogin.valid) {
-        bdd.promise("SELECT * FROM users WHERE email=? LIMIT 1", [req.body.email])
+        bdd.promise(queries.login, [req.body.email])
         .then(result => {
             if (result.length > 0) {
                 bcrypt.compare(req.body.password, result[0].password)

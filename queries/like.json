@@ -1,0 +1,7 @@
+{
+    "create": {
+        "check": "SELECT id FROM posts WHERE id=? LIMIT 1",
+        "delete": "DELETE FROM likes WHERE postId=? && userId=?",
+        "insert": "INSERT INTO likes (postId, userId, value) VALUES (?, ?, ?)"
+    }
+}

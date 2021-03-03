@@ -1,15 +1,15 @@
-const Like = require('../models/like');
 const bdd = require("../bdd/bdd");
+const queries = require('../queries/like.json');
 
 exports.createLike = (req, res, next) => {
-    bdd.promise("SELECT id FROM posts WHERE id=? LIMIT 1", [req.params.postId])
+    bdd.promise(queries.create.check, [req.params.postId])
     .then(result => {
         if (result.length > 0) {
-            bdd.promise("DELETE FROM likes WHERE postId=? && userId=?",[req.params.postId, req.body.currentUserId], "Erreur sur le delete")
+            bdd.promise(queries.create.delete,[req.params.postId, req.body.currentUserId], "Erreur sur le delete")
             .then(() => {
                 const test_array = [1, -1];
                 if (test_array.includes(req.body.like)) {
-                    bdd.promise("INSERT INTO likes (postId, userId, value) VALUES (?, ?, ?)", [req.params.postId, req.body.currentUserId,req.body.like], "Problème d'accès à la base de données.")
+                    bdd.promise(queries.create.insert, [req.params.postId, req.body.currentUserId,req.body.like], "Problème d'accès à la base de données.")
                     .then(() => res.status(200).json({ message: "Like mis à jour avec succès !" }))
                     .catch(error => res.status(400).json({ message: ""+error }));
                 } else {

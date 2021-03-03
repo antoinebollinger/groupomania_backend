@@ -1,19 +1,17 @@
-const Post = require('../models/post');
 const bdd = require("../bdd/bdd");
+const queries = require('../queries/post.json');
 const fs = require('fs');
 
 exports.createPost = (req, res, next) => {
     const postObject = JSON.parse(req.body.post);
     const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
-    bdd.promise("INSERT INTO posts (userId, content, imageUrl) VALUES (?, ?, ?)", [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
+    bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
     .then(() => res.status(201).json({ message: "Publication créée avec succès." }))
     .catch(error => res.status(400).json({ error }));
 };
 
 exports.getOnePost = (req, res, next) => {
-    const query = `SELECT p.id, p.userId, us.imageUrl AS 'userImage', CONCAT(us.firstName," ",us.lastName) AS "user", p.content, p.imageUrl, p.postDate, SUM(CASE l.value WHEN 1 THEN 1 ELSE 0 END) AS "likes", SUM(CASE l.value WHEN -1 THEN 1 ELSE 0 END) AS "dislikes", COALESCE(c.comments,0) AS "comments", SUM(CASE l.userId WHEN ? THEN l.value ELSE 0 END) AS "currentUserLike" FROM posts p LEFT JOIN likes l ON l.postId = p.id LEFT JOIN (SELECT postId, COUNT(id) AS "comments" FROM comments GROUP BY postId) AS c ON c.postId = p.id LEFT JOIN users us ON us.id = p.userId WHERE p.id=? GROUP BY p.id`;
-    const queryParams = [req.query.currentUserId, req.params.postId];
-    bdd.promise(query, queryParams, "Impossible d'afficher la publication demandée.")
+    bdd.promise(queries.getOne, [req.query.currentUserId, req.params.postId], "Impossible d'afficher la publication demandée.")
     .then(post => res.status(200).json(post))
     .catch(error => res.status(400).json({ error }));
 };

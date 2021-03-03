@@ -1,0 +1,13 @@
+{
+    "create": {
+        "check": "SELECT id FROM posts WHERE id=? LIMIT 1",
+        "insert": "INSERT INTO comments (postId, userId, content) VALUE (?, ?, ?)"
+    },
+    "getAll": "SELECT c.id, c.postId, c.userId, COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', u.imageUrl AS 'userImage',c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=? ORDER BY c.commentDate ASC",
+    "update": "UPDATE comments SET content = ? WHERE id = ? && userId = ? && postId = ?",
+    "delete": {
+        "check": "SELECT * FROM comments WHERE id=?",
+        "delete": "DELETE FROM comments WHERE id=?"
+    }
+
+}
