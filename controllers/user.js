@@ -47,7 +47,6 @@ exports.deleteUser = (req, res, next) => {
                 imgToDelete.push(element.imgPosts);
             }
         });
-        console.log(imgToDelete);
         if (result.length > 0) {
             bcrypt.compare(req.body.password, result[0].password)
             .then(valid => {

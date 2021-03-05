@@ -9,9 +9,8 @@ const multer = require('../middleware/multer-config');
 const postCtrl = require('../controllers/post');
 const likeCtrl = require('../controllers/like');
 const commentCtrl = require('../controllers/comment');
-const notifCtrl = require('../controllers/notification');
 
-// ----- Routage des controllers ---------- //
+
 // POSTS
 router.post('/', auth, multer, postCtrl.createPost);
 router.get('/', auth, postCtrl.getAllPosts);
@@ -25,9 +24,5 @@ router.post('/:postId/comment', auth, commentCtrl.createComment);
 router.get('/:postId/comment', auth, commentCtrl.getAllComments);
 router.put('/:postId/comment/:commentId', auth, commentCtrl.updateComment);
 router.delete('/:postId/comment/:commentId', auth, commentCtrl.deleteComment);
-// NOTIFICATIONS 
-router.post('/notification', auth, notifCtrl.createNotif);
-router.get('/notification', auth, notifCtrl.getNotif);
-router.delete('/notification/:notifId', auth, notifCtrl.deleteNotif);
 
 module.exports = router;

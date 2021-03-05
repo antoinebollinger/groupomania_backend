@@ -6,8 +6,8 @@ exports.createComment = (req, res, next) => {
     .then(result => {
         if (result.length > 0) {
             bdd.promise(queries.create.insert, [req.params.postId, req.body.currentUserId, req.body.content], "Problème d'accès à la base de données")
-            .then(() => res.status(200).json({ message: "Commentaire créé avec succès !" }))
-            .catch(error => res.status(400).json({ message: ""+error }));
+            .then(response => res.status(200).json({ message: "Commentaire créé avec succès !", commentId: response[1] }))
+            .catch(error => res.status(400).json({ error }));
         } else {
             return res.status(401).json({ message: "Aucun post associé n'a été trouvé." });
         }
@@ -18,7 +18,7 @@ exports.createComment = (req, res, next) => {
 exports.getAllComments = (req, res, next) => {
     bdd.promise(queries.getAll,[req.params.postId], "Impossible d'afficher les commentaires.")
     .then(comments => res.status(200).json(comments))
-    .catch(error => res.status(400).json({ message: ""+error }));
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.updateComment = (req, res, next) => {
@@ -35,10 +35,10 @@ exports.deleteComment = (req, res, next) => {
         if (result.length > 0) {
             bdd.promise(queries.delete.delete, [req.params.commentId])
             .then(() => res.status(201).json({ message: "Commentaire supprimé avec succès." }))
-            .catch(error => res.status(500).json({ message: ""+error }));     
+            .catch(error => res.status(500).json({ error }));     
         } else {
             return res.status(401).json({ message: "Aucun commentaire associé n'a été trouvé." });
         }
     })
-    .catch(error => res.status(500).json({ message: ""+error }));
+    .catch(error => res.status(500).json({ error }));
 };

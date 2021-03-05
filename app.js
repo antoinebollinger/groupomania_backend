@@ -34,6 +34,9 @@ app.use('/api/user', userRoutes);
 // Post : gestion des posts
 const postRoutes = require('./routes/post');
 app.use('/api/post', postRoutes);
+// Notification : gestion des notifications
+const notifRoutes = require('./routes/notification');
+app.use('/api/notification', notifRoutes);
 
 // Export
 module.exports = app;

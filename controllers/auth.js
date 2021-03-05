@@ -94,5 +94,5 @@ exports.login = (req, res, next) => {
 };
 
 exports.logout = (req, res, next) => {
-    return res.status(200).json({ message: "Vous devriez être déconnecté et redirigé vers la page d'accueil."});
+    return res.status(200).json({ message: "Vous allez être déconnecté et redirigé vers la page d'accueil."});
 };

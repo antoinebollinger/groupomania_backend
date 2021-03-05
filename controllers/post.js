@@ -6,7 +6,7 @@ exports.createPost = (req, res, next) => {
     const postObject = JSON.parse(req.body.post);
     const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
     bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
-    .then(() => res.status(201).json({ message: "Publication créée avec succès." }))
+    .then(response => res.status(201).json({ message: "Publication créée avec succès.", postId: response[1] }))
     .catch(error => res.status(400).json({ error }));
 };
 
