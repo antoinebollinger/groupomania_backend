@@ -60,7 +60,7 @@ exports.deleteUser = (req, res, next) => {
                         }              
                     })
                     let query = (req.body.deleteDatas) ? queries.delete.delete.userAndDatas : queries.delete.delete.onlyUser ;
-                    let queryMessage = (req.body.deleteDatas) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés." : "Votre compte a bien été supprimé." ;
+                    let queryMessage = (req.body.deleteDatas) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés. Vous allez être redirigé vers l'accueil." : "Votre compte a bien été supprimé. Vous allez être redirigé vers l'accueil." ;
                     bdd.promise(query, [req.params.currentUserId, req.body.email])
                     .then(() => res.status(201).json({ message: queryMessage }))
                     .catch(error => res.status(500).json({ error }));
