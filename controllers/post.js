@@ -3,6 +3,7 @@ const queries = require('../queries/post.json');
 const fs = require('fs');
 
 exports.createPost = (req, res, next) => {
+    console.log(req.body.post);
     const postObject = JSON.parse(req.body.post);
     const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
     bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
