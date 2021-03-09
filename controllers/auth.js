@@ -78,7 +78,8 @@ exports.login = (req, res, next) => {
                             firstName: result[0].firstName,
                             lastName: result[0].lastName,
                             imageUrl: result[0].imageUrl,
-                            admin: (result[0].admin == 0) ? false : true
+                            fonction: result[0].fonction,
+                            admin: result[0].admin
                         });
                     }
                 })

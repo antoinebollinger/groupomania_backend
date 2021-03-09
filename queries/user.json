@@ -1,9 +1,11 @@
 {
-    "getOne": "SELECT firstName, lastName, imageUrl FROM users WHERE id = ?",
-    "getAll": "SELECT id, firstName, lastName, imageUrl FROM users",
+    "getOne": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id = ?",
+    "getAll": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users",
+    "getRand": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? ORDER BY RAND() LIMIT ?",
+    "getUsersWithFilter": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? AND (firstName LIKE ? OR lastName LIKE ? OR fonction LIKE ?) LIMIT 10",
     "update": {
         "check": "SELECT imageUrl FROM users WHERE id=?",
-        "update": "UPDATE users SET email=?, firstName=?, lastname=?, imageUrl=? WHERE id=?"
+        "update": "UPDATE users SET email=?, firstName=?, lastname=?, fonction=?, imageUrl=? WHERE id=?"
     },
     "delete": {
         "check": "SELECT u.password, u.imageUrl AS 'imgProfil', COALESCE(p.imageUrl,'') AS 'imgPosts' FROM users u LEFT JOIN posts p ON p.userId = u.id WHERE u.id=? && u.email=?",

@@ -7,7 +7,7 @@ exports.checkForm = (inputs) => {
         switch(inputs[property].type) {
             case "text": 
             //Les textes doivent contenir des caractères alphanumériques, apostrophe et espace, et ne pas être vides
-            regExTest = /^[a-zA-Z \-']+$/;
+            regExTest = /^[\-/A-Za-z\u00C0-\u017F ]+$/;
             returnMsg = "Ce champ ne peut pas être vide.";
             break;
             case "email":
