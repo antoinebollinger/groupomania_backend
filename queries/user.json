@@ -3,9 +3,14 @@
     "getAll": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users",
     "getRand": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? ORDER BY RAND() LIMIT ?",
     "getUsersWithFilter": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? AND (firstName LIKE ? OR lastName LIKE ? OR fonction LIKE ?) LIMIT 10",
+    "userWantsNotifs": "UPDATE users SET notification = ? WHERE id = ?",
     "update": {
-        "check": "SELECT imageUrl FROM users WHERE id=?",
+        "check": "SELECT imageUrl FROM users WHERE id=? LIMIT 1",
         "update": "UPDATE users SET email=?, firstName=?, lastname=?, fonction=?, imageUrl=? WHERE id=?"
+    },
+    "updatePwd": {
+        "check": "SELECT password FROM users WHERE id=? LIMIT 1",
+        "update": "UPDATE users SET password=? WHERE id=?"
     },
     "delete": {
         "check": "SELECT u.password, u.imageUrl AS 'imgProfil', COALESCE(p.imageUrl,'') AS 'imgPosts' FROM users u LEFT JOIN posts p ON p.userId = u.id WHERE u.id=? && u.email=?",

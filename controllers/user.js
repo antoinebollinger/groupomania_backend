@@ -1,5 +1,6 @@
 const bdd = require("../bdd/bdd");
 const queries = require('../queries/user.json');
+const checkFunctions = require("../middleware/functions");
 const bcrypt = require('bcrypt');
 const fs = require('fs');
 
@@ -27,6 +28,13 @@ exports.getUsersWithFilter = (req, res, next) => {
     .catch(error => res.status(400).json({ error }));
 };
 
+exports.userWantsNotifs = (req, res, next) => {
+    const queryMessage = (req.body.notification > -1) ? "Notifications activées avec succès" : "Notifications désactivées avec succès" ;
+    bdd.promise(queries.userWantsNotifs, [req.body.notification, req.params.currentUserId])
+    .then(() => res.status(201).json({ message: queryMessage }))
+    .catch(error => res.status(500).json({ error }));    
+};
+
 exports.updateUser = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
     bdd.promise(queries.update.check, [req.params.currentUserId])
@@ -48,6 +56,51 @@ exports.updateUser = (req, res, next) => {
         }
     })
     .catch(error => res.status(500).json({ error }));
+};
+
+exports.updatePwd = (req, res, next) => {
+    bdd.promise(queries.updatePwd.check, [req.params.currentUserId])
+    .then(result => {
+        if (result.length > 0) {
+            bcrypt.compare(req.body.oldPwd, result[0].password)
+            .then(valid => {
+                if (!valid) {
+                    return res.status(401).json({ objet: "password", message: "Mot de passe incorrect !" });
+                } else {
+                    if (req.body.newPwd1 != req.body.newPwd2) {
+                        return res.status(401).json({ objet: "password", message: "Les nouveaux mots de passe ne correspondent pas." });
+                    } else {
+                        const userObjectTest = {
+                            "newPwd1": {
+                                "value": req.body.newPwd1,
+                                "type": "password"
+                            },
+                            "newPwd2": {
+                                "value": req.body.newPwd2,
+                                "type": "password"
+                            }
+                        };
+                        const goUpdate = checkFunctions.checkForm(userObjectTest);
+                        if (goUpdate.valid) {
+                            bcrypt.hash(req.body.newPwd1, 10) 
+                            .then(hash => {
+                                bdd.promise(queries.updatePwd.update, [hash, req.params.currentUserId])
+                                .then(() => res.status(201).json({ message: "Mot de passe modifié avec succès." }))
+                                .catch(error => res.status(500).json({ error }));
+                            })
+                            .catch(error => res.status(500).json({ error }));
+                        } else {
+                            return res.status(401).json({ message: "Impossible de modifier le mot de passe. Veuillez vérifier vos informations." });
+                        }
+                    }
+                }
+            })
+            .catch(error => res.status(500).json({ error }));
+        } else {
+            return res.status(401).json({ message: "Aucun compte associé n'a été trouvé." });
+        }
+    })
+    .catch(error => res.status(500).json({ error }));   
 };
 
 exports.deleteUser = (req, res, next) => {

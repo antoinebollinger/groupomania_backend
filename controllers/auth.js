@@ -24,7 +24,7 @@ exports.signup = (req, res, next) => {
             "value": userObject.lastName,
             "type": "text"
         }
-    }
+    };
     const goSignup = checkFunctions.checkForm(userObjectTest);
     if (goSignup.valid) {
         bdd.promise(queries.signup.check, [userObject.email])
@@ -79,7 +79,8 @@ exports.login = (req, res, next) => {
                             lastName: result[0].lastName,
                             imageUrl: result[0].imageUrl,
                             fonction: result[0].fonction,
-                            admin: result[0].admin
+                            admin: result[0].admin,
+                            notification: result[0].notification
                         });
                     }
                 })
