@@ -3,7 +3,7 @@
         "check": "SELECT id FROM posts WHERE id=? LIMIT 1",
         "insert": "INSERT INTO comments (postId, userId, content) VALUE (?, ?, ?); SELECT LAST_INSERT_ID() AS 'commentId'"
     },
-    "getAll": "SELECT c.id, c.postId, c.userId, COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', COALESCE(u.imageUrl,'') AS 'userImage', c.content, c.commentDate FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=? ORDER BY c.commentDate ASC",
+    "getAll": "SELECT c.id, c.postId, c.userId, COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', COALESCE(u.imageUrl,'') AS 'userImage', c.content, c.commentDate, TIMESTAMPDIFF(MINUTE, DATE_FORMAT(c.commentDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'commentDateM', TIMESTAMPDIFF(HOUR, DATE_FORMAT(c.commentDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'commentDateH', TIMESTAMPDIFF(DAY, DATE_FORMAT(c.commentDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'commentDateD' FROM comments c LEFT JOIN users u ON c.userId = u.id WHERE c.postId=? ORDER BY c.commentDate ASC",
     "update": "UPDATE comments SET content = ? WHERE id = ? && userId = ? && postId = ?",
     "delete": {
         "check": "SELECT * FROM comments WHERE id=?",
