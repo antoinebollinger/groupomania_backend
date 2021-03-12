@@ -1,10 +1,7 @@
 {
     "create": "INSERT INTO notifications (userId, postId, commentId) VALUES (?, ?, ?)",
-    "getAllActive": "SELECT n.*, TIMESTAMPDIFF(MINUTE, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateM', TIMESTAMPDIFF(HOUR, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateH', TIMESTAMPDIFF(DAY, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateD', u.firstName, u.lastName, u.imageUrl FROM notifications n LEFT JOIN users u ON u.id = n.userId WHERE n.active=1 && n.userId != ? ORDER BY notificationDate DESC",
     "getAll": "SELECT n.*, TIMESTAMPDIFF(MINUTE, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateM', TIMESTAMPDIFF(HOUR, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateH', TIMESTAMPDIFF(DAY, DATE_FORMAT(n.notificationDate, '%Y-%m-%d %H:%i:%s'), DATE_FORMAT(NOW(), '%Y-%m-%d %H:%i:%s')) AS 'notificationDateD', COALESCE(u.firstName,'') AS 'firstName', COALESCE(u.lastName,'') AS 'lastName', COALESCE(u.imageUrl,'') AS 'userImage', COALESCE(GROUP_CONCAT(a.userId),0) AS 'inactiveUsers' FROM notifications n LEFT JOIN activenotifications a ON a.notificationId = n.id LEFT JOIN users u ON u.id = n.userId WHERE n.userId != ? GROUP BY n.id ORDER BY notificationDate DESC",
-    "disable": "UPDATE notifications SET active=0 WHERE id=?",
-    "enable": "UPDATE notifications SET active=1 WHERE id=?",
+    "getAllActive": "SELECT COUNT(n.id) AS 'nbNotifications' FROM notifications n LEFT JOIN users u ON u.id = ? WHERE (n.notificationDate > u.notificationDate) LIMIT 1",
     "unactive": "INSERT INTO activeNotifications (notificationId, userId) VALUES (?, ?)",
-    "active": "DELETE FROM activeNotifications WHERE notificationId = ? && userId = ?",
-    "delete": "DELETE FROM notifications WHERE id=?"
+    "active": "DELETE FROM activeNotifications WHERE notificationId = ? && userId = ?"
 }

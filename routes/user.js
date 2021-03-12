@@ -9,8 +9,9 @@ const multer = require('../middleware/multer-config');
 const userCtrl = require('../controllers/user');
 
 // Routage des controleurs
-// USER WANTS NOTIFICATION OR NOT 
+// USER WANTS NOTIFICATION OR NOT && RESET
 router.put('/:currentUserId/notifs', auth, userCtrl.userWantsNotifs);
+router.put('/:currentUserId/reset', auth, userCtrl.resetActiveNotifs);
 // REGULAR ROUTES
 router.get('/', auth, userCtrl.getAllUsers);
 router.get('/:currentUserId/filter/:filter', auth, userCtrl.getUsersWithFilter);

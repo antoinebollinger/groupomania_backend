@@ -29,11 +29,18 @@ exports.getUsersWithFilter = (req, res, next) => {
 };
 
 exports.userWantsNotifs = (req, res, next) => {
-    const queryMessage = (req.body.notification > -1) ? "Notifications activées avec succès" : "Notifications désactivées avec succès" ;
+    const queryMessage = (req.body.notification == 1) ? "Notifications activées avec succès" : "Notifications désactivées avec succès" ;
     bdd.promise(queries.userWantsNotifs, [req.body.notification, req.params.currentUserId])
     .then(() => res.status(201).json({ message: queryMessage }))
     .catch(error => res.status(500).json({ error }));    
 };
+
+exports.resetActiveNotifs = (req, res, next) => {
+    console.log(req.params);
+    bdd.promise(queries.resetActiveNotifs, [req.params.currentUserId])
+    .then(() => res.status(201).json({ message: 'Remise à zéro du compteur des notifications' }))
+    .catch(error => res.status(500).json({ error }));  
+}
 
 exports.updateUser = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);

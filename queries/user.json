@@ -4,6 +4,7 @@
     "getRand": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? ORDER BY RAND() LIMIT ?",
     "getUsersWithFilter": "SELECT id, firstName, lastName, imageUrl, fonction, admin, email FROM users WHERE id != ? AND (firstName LIKE ? OR lastName LIKE ? OR fonction LIKE ?) LIMIT 10",
     "userWantsNotifs": "UPDATE users SET notification = ? WHERE id = ?",
+    "resetActiveNotifs": "UPDATE users SET notificationDate = CURRENT_TIMESTAMP WHERE id = ?",
     "update": {
         "check": "SELECT imageUrl FROM users WHERE id=? LIMIT 1",
         "update": "UPDATE users SET email=?, firstName=?, lastname=?, fonction=?, imageUrl=? WHERE id=?"

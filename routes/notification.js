@@ -11,7 +11,7 @@ const notifCtrl = require('../controllers/notification');
 // NOTIFICATIONS 
 router.post('/', auth, notifCtrl.createNotif);
 router.get('/:currentUserId', auth, notifCtrl.getNotif);
-router.delete('/:notifId', auth, notifCtrl.deleteNotif);
+router.get('/:currentUserId/active', auth, notifCtrl.getActiveNotif);
 // ACTIVE-INACTIVE NOTIFICATIONS
 router.post('/:notifId/active', auth, notifCtrl.unactiveNotif);
 router.delete('/:notifId/active', auth, notifCtrl.activeNotif);
