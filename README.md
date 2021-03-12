@@ -1,22 +1,23 @@
 # Groupomania project : create a social network
 
-Instructions
+> The social network by Groupomania
 
-- Clone the global project (https://github.com/antoinebollinger/AntoineBollinger_7_03022021) on your local machine
+Backend repo
 
-# Backend part
+## Backend
 
-For this part: 
+Before your start, make sure you have access to a Mysql server. You'll need to create a ```.env``` file a the root of your backend file, with the following:
 
-- Create a .env file a the root of the project, with :
-DB_HOST=/your host - can be localhost
-DB_USER=/your user - can be root
-DB_PASSWORD=/your password - empty when localhost
-DB_DATABASE=groupomania
+```
+DB_HOST=//your host - if local, localhost
+DB_USER=//your username - if local, root
+DB_PASSWORD=//your password - if local, empty
+DB_DATABASE=groupomania //must be groupomania
+```
 
-- Start the API with 
-'node server' (or 'nodemon server' if available)
+Then you can go : 
 
-=> the API will automaticly create a new database named "Groupomania" with all tables necessary
-=> The API will be runing at http://localhost:3000 or http://your_ip_address:3000
-
+```
+npm install
+node server
+```
