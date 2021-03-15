@@ -44,25 +44,48 @@ exports.resetActiveNotifs = (req, res, next) => {
 
 exports.updateUser = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
-    bdd.promise(queries.update.check, [req.params.currentUserId])
-    .then(result => {
-        if (result.length > 0) {
-            if (req.file && `${req.protocol}://${req.get('host')}/images/${req.file.filename}` != result[0].imageUrl) {
-                const filename = result[0].imageUrl.split('/images/')[1];
-                if (filename != 'user.png') {
-                    fs.unlink(`images/${filename}`,() => {});
-                }
-            }
-            const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
-            bdd.promise(queries.update.update, [userObject.email, userObject.firstName, userObject.lastName, userObject.fonction, userImageUrl, req.params.currentUserId])
-            .then(() => res.status(201).json({ message: "Compte modifié avec succès.", newUrl: userImageUrl }))
-            .catch(error => res.status(500).json({ error }));
-
-        } else {
-            return res.status(401).json({ message: "Aucun compte associé n'a été trouvé." });
+    const userObjectTest = {
+        "email": {
+            "value": userObject.email,
+            "type": "email"
+        },
+        "firstName": {
+            "value": userObject.firstName,
+            "type": "text"
+        },
+        "lastName": {
+            "value": userObject.lastName,
+            "type": "text"
+        },
+        "lastName": {
+            "value": userObject.fonction,
+            "type": "text"
         }
-    })
-    .catch(error => res.status(500).json({ error }));
+    };
+    const goSignup = checkFunctions.checkForm(userObjectTest);
+    if (goSignup.valid) {
+        bdd.promise(queries.update.check, [req.params.currentUserId])
+        .then(result => {
+            if (result.length > 0) {
+                if (req.file && `${req.protocol}://${req.get('host')}/images/${req.file.filename}` != result[0].imageUrl) {
+                    const filename = result[0].imageUrl.split('/images/')[1];
+                    if (filename != 'user.png') {
+                        fs.unlink(`images/${filename}`,() => {});
+                    }
+                }
+                const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
+                bdd.promise(queries.update.update, [userObject.email, userObject.firstName, userObject.lastName, userObject.fonction, userImageUrl, req.params.currentUserId])
+                .then(() => res.status(201).json({ message: "Compte modifié avec succès.", newUrl: userImageUrl }))
+                .catch(error => res.status(500).json({ error }));
+
+            } else {
+                return res.status(401).json({ message: "Aucun compte associé n'a été trouvé." });
+            }
+        })
+        .catch(error => res.status(500).json({ error }));
+    } else {
+        return res.status(401).json({ message: "Impossible de modifier ce compte. Veuillez vérifier vos informations." });        
+    }
 };
 
 exports.updatePwd = (req, res, next) => {
