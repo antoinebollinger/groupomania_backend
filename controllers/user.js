@@ -36,7 +36,6 @@ exports.userWantsNotifs = (req, res, next) => {
 };
 
 exports.resetActiveNotifs = (req, res, next) => {
-    console.log(req.params);
     bdd.promise(queries.resetActiveNotifs, [req.params.currentUserId])
     .then(() => res.status(201).json({ message: 'Remise à zéro du compteur des notifications' }))
     .catch(error => res.status(500).json({ error }));  
