@@ -27,3 +27,9 @@ exports.createLike = (req, res, next) => {
     })
     .catch(error => res.status(500).json({ message: ""+error }));
 };
+
+exports.getAllLikes = (req, res, next) => {
+    bdd.promise(queries.getAll,[req.params.postId], "Impossible d'afficher les utilisateurs qui ont aimé cette publication.")
+    .then(likes => res.status(200).json(likes))
+    .catch(error => res.status(400).json({ error }));
+};

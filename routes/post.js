@@ -19,6 +19,7 @@ router.put('/:postId', auth, multer, postCtrl.updatePost);
 router.delete('/:postId', auth, postCtrl.deletePost);
 // LIKES
 router.post('/:postId/like', auth, likeCtrl.createLike);
+router.get('/:postId/like', auth, likeCtrl.getAllLikes);
 // COMMENTS
 router.post('/:postId/comment', auth, commentCtrl.createComment);
 router.get('/:postId/comment', auth, commentCtrl.getAllComments);

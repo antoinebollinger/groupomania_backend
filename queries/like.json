@@ -3,5 +3,6 @@
         "check": "SELECT id FROM posts WHERE id=? LIMIT 1",
         "delete": "DELETE FROM likes WHERE postId=? && userId=?",
         "insert": "INSERT INTO likes (postId, userId, value) VALUES (?, ?, ?)"
-    }
+    },
+    "getAll": "SELECT * FROM likes l LEFT JOIN users u ON l.userId = u.id WHERE l.postId = ?"
 }
