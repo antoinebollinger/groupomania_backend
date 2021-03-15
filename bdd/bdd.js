@@ -7,7 +7,8 @@ const bdd = mysql.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    multipleStatements: true
+    multipleStatements: true,
+    reconnect: true
 });
 bdd.connect((err) => {
     if(err) {throw err;}
