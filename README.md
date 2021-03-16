@@ -21,3 +21,5 @@ Then you can go :
 npm install
 node server
 ```
+
+> For more infos about this API, please read the guidelines file.
