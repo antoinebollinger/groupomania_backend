@@ -1,11 +1,12 @@
 const bdd = require("../bdd/bdd");
 const queries = require('../queries/comment.json');
+const htmlspecialchars = require('htmlspecialchars');
 
 exports.createComment = (req, res, next) => {
     bdd.promise(queries.create.check, [req.params.postId])
     .then(result => {
         if (result.length > 0) {
-            bdd.promise(queries.create.insert, [req.params.postId, req.body.currentUserId, req.body.content], "Problème d'accès à la base de données")
+            bdd.promise(queries.create.insert, [req.params.postId, req.body.currentUserId, htmlspecialchars(req.body.content)], "Problème d'accès à la base de données")
             .then(response => res.status(200).json({ message: "Commentaire créé avec succès !", commentId: response[1] }))
             .catch(error => res.status(400).json({ error }));
         } else {
@@ -22,7 +23,7 @@ exports.getAllComments = (req, res, next) => {
 };
 
 exports.updateComment = (req, res, next) => {
-    bdd.promise(queries.update, [req.body.content, req.params.commentId, req.body.currentUserId, req.params.postId])
+    bdd.promise(queries.update, [htmlspecialchars(req.body.content), req.params.commentId, req.body.currentUserId, req.params.postId])
     .then(() => res.status(201).json({ message: "Commentaire modifié avec succès." }))
     .catch(error => res.status(500).json({ error }));
 }; 

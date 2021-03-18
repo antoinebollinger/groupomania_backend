@@ -1,11 +1,12 @@
 const bdd = require("../bdd/bdd");
 const queries = require('../queries/post.json');
+const htmlspecialchars = require('htmlspecialchars');
 const fs = require('fs');
 
 exports.createPost = (req, res, next) => {
     const postObject = JSON.parse(req.body.post);
     const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
-    bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
+    bdd.promise(queries.create, [postObject.currentUserId, htmlspecialchars(postObject.content), postImageUrl], "Impossible de créer la publication.")
     .then(response => res.status(201).json({ message: "Publication créée avec succès.", postId: response[1] }))
     .catch(error => res.status(400).json({ error }));
 };
@@ -36,7 +37,7 @@ exports.updatePost = (req, res, next) => {
                 fs.unlink(`images/${filename}`,() => {});
             }   
             const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
-            bdd.promise(queries.update.update, [postObject.content, postImageUrl, req.params.postId])
+            bdd.promise(queries.update.update, [htmlspecialchars(postObject.content), postImageUrl, req.params.postId])
             .then(() => res.status(201).json({ message: "Publication modifiée avec succès." }))
             .catch(error => res.status(500).json({ error }));     
         } else {

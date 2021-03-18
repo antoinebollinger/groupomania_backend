@@ -14,7 +14,7 @@ exports.getNotif = (req, res, next) => {
 };
 
 exports.getActiveNotif = (req, res, next) => {
-    bdd.promise(queries.getAllActive,[req.params.currentUserId], "Impossible d'afficher les notifications.")
+    bdd.promise(queries.getAllActive,[req.params.currentUserId, req.params.currentUserId], "Impossible d'afficher les notifications.")
     .then(notifications => res.status(200).json(notifications))
     .catch(error => res.status(400).json({ error }));
 };
