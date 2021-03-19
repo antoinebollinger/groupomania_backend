@@ -8,7 +8,12 @@ exports.checkForm = (inputs) => {
             case "text": 
             //Les textes doivent contenir des caractères alphanumériques, apostrophe et espace, et ne pas être vides
             regExTest = /^[\-/A-Za-z\u00C0-\u017F -,]+$/;
-            returnMsg = "Ce champ ne peut pas être vide.";
+            returnMsg = "Ce champ ne peut pas être vide ne doit contenir que des caractères alphanumériques.";
+            break;
+            case "textEmpty": 
+            //Variante pour les textes qui peuvent être vide
+            regExTest = /^[\-/A-Za-z\u00C0-\u017F -,]*$/;
+            returnMsg = "Ce champ ne doit contenir que des caractères alphanumériques.";
             break;
             case "email":
             //Les emails doivent avoir une structure d'email blabla@bla.bla

@@ -56,9 +56,9 @@ exports.updateUser = (req, res, next) => {
             "value": userObject.lastName,
             "type": "text"
         },
-        "lastName": {
+        "fonction": {
             "value": userObject.fonction,
-            "type": "text"
+            "type": "textEmpty"
         }
     };
     const goSignup = checkFunctions.checkForm(userObjectTest);
