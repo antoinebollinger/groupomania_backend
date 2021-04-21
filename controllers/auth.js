@@ -4,8 +4,13 @@ const checkFunctions = require("../middleware/functions");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-exports.signup = (req, res, next) => {
-    const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : `${req.protocol}://${req.get('host')}/images/user.png`;
+const defaultUserImageUrl = "https://res.cloudinary.com/hbmi6hrw8/image/upload/v1618988246/groupomania/user_iqjqqb.png";
+
+//cloudinary
+const uploader = require('./../middleware/cloudinary-config');
+
+exports.signup = async (req, res, next) => {
+    const userImageUrl = (req.file) ? await uploader(req.file) : defaultUserImageUrl;
     const userObject = JSON.parse(req.body.user);
     const userObjectTest = {
         "email": {
