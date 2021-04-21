@@ -4,13 +4,11 @@ const checkFunctions = require("../middleware/functions");
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+//cloudinary
+const cloud = require('../middleware/cloudinary-config');
 const defaultUserImageUrl = "https://res.cloudinary.com/hbmi6hrw8/image/upload/v1618988246/groupomania/user_iqjqqb.png";
 
-//cloudinary
-const uploader = require('./../middleware/cloudinary-config');
-
-exports.signup = async (req, res, next) => {
-    const userImageUrl = (req.file) ? await uploader(req.file) : defaultUserImageUrl;
+exports.signup = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
     const userObjectTest = {
         "email": {
@@ -33,20 +31,21 @@ exports.signup = async (req, res, next) => {
     const goSignup = checkFunctions.checkForm(userObjectTest);
     if (goSignup.valid) {
         bdd.promise(queries.signup.check, [userObject.email])
-        .then(result => {
-            if (result.length == 0) {
+        .then(async (result) => {
+            if (result.length === 0) {
+                const userImageUrl = (req.file) ? await cloud.uploader(req.file) : defaultUserImageUrl;
                 bcrypt.hash(userObject.password, 10) 
-                .then(hash => {
+                .then(async (hash) => {
                     bdd.promise(queries.signup.insert, [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl], "Impossible de créer le compte.")
                     .then(() => res.status(201).json({ message: "Compte créé avec succès." }))
                     .catch(error => res.status(500).json({ error }));
                 })
-                .catch(error => res.status(500).json({ error }));
+                .catch(error => res.status(500).json({ message: "c'est ici" }));
             } else {
                 return res.status(401).json({ message: "Cet email est déjà associé à un compte." });
             }
         })
-        .catch(error => res.status(500).json({ error }));
+        .catch(error => res.status(500).json({ message: "c'est là" }));
     } else {
         return res.status(401).json({ message: "Impossible de créer un compte. Veuillez vérifier vos informations." });
     }

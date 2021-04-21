@@ -1,6 +1,5 @@
 const bdd = require("../bdd/bdd");
 const queries = require('../queries/comment.json');
-const htmlspecialchars = require('htmlspecialchars');
 
 exports.createComment = (req, res, next) => {
     bdd.promise(queries.create.check, [req.params.postId])

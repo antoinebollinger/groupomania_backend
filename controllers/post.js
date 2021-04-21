@@ -1,12 +1,14 @@
 const bdd = require("../bdd/bdd");
 const queries = require('../queries/post.json');
-const htmlspecialchars = require('htmlspecialchars');
-const fs = require('fs');
+const path = require('path');
 
-exports.createPost = (req, res, next) => {
+//cloudinary
+const cloud = require('../middleware/cloudinary-config');
+
+exports.createPost = async (req, res, next) => {
     const postObject = JSON.parse(req.body.post);
-    const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : "";
-    bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImageUrl], "Impossible de créer la publication.")
+    const postImage = (req.file) ? await cloud.uploader(req.file) : "";
+    bdd.promise(queries.create, [postObject.currentUserId, postObject.content, postImage], "Impossible de créer la publication.")
     .then(response => res.status(201).json({ message: "Publication créée avec succès.", postId: response[1] }))
     .catch(error => res.status(400).json({ error }));
 };
@@ -30,13 +32,14 @@ exports.updatePost = (req, res, next) => {
     const query = (postObject.admin) ? queries.update.check.isAdmin : queries.update.check.notAdmin ;
     const queryParams = (postObject.admin) ? [req.params.postId] : [req.params.postId, postObject.currentUserId] ;
     bdd.promise(query, queryParams)
-    .then(result => {
+    .then(async (result) => {
         if (result.length > 0) {
-            if (req.file && `${req.protocol}://${req.get('host')}/images/${req.file.filename}` != result[0].imageUrl) {
-                const filename = result[0].imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`,() => {});
-            }   
-            const postImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
+            if (req.file && result[0].imageUrl != '') {
+                const deleteImage = result[0].imageUrl;
+                const deleteImageId = path.parse(deleteImage.substring(deleteImage.lastIndexOf('/') + 1)).name;
+                await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);
+            }
+            const postImageUrl = (req.file) ? await cloud.uploader(req.file) : result[0].imageUrl;
             bdd.promise(queries.update.update, [postObject.content, postImageUrl, req.params.postId])
             .then(() => res.status(201).json({ message: "Publication modifiée avec succès." }))
             .catch(error => res.status(500).json({ error }));     
@@ -51,11 +54,12 @@ exports.deletePost = (req, res, next) => {
     const query = (req.body.admin) ? queries.delete.check.isAdmin : queries.delete.check.notAdmin ;
     const queryParams = (req.body.admin) ? [req.params.postId] : [req.params.postId, req.body.currentUserId] ;
     bdd.promise(query, queryParams)
-    .then(result => {
+    .then(async (result) => {
         if (result.length > 0) {
             if (result[0].imageUrl != "") {
-                const filename = result[0].imageUrl.split('/images/')[1];
-                fs.unlink(`images/${filename}`,() => {});
+                const deleteImage = result[0].imageUrl;
+                const deleteImageId = path.parse(deleteImage.substring(deleteImage.lastIndexOf('/') + 1)).name;
+                await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);
             }
             bdd.promise(queries.delete.delete, [req.params.postId])
             .then(() => res.status(201).json({ message: "Publication supprimée avec succès." }))

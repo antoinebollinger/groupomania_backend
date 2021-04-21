@@ -2,7 +2,11 @@ const bdd = require("../bdd/bdd");
 const queries = require('../queries/user.json');
 const checkFunctions = require("../middleware/functions");
 const bcrypt = require('bcrypt');
-const fs = require('fs');
+const path = require('path');
+
+//cloudinary
+const cloud = require('../middleware/cloudinary-config');
+const defaultUserImageUrl = "https://res.cloudinary.com/hbmi6hrw8/image/upload/v1618988246/groupomania/user_iqjqqb.png";
 
 exports.getOneUser = (req, res, next) => {
     bdd.promise(queries.getOne, [req.params.userId], "Impossible d'afficher l'utilisateur demandé.")
@@ -61,18 +65,17 @@ exports.updateUser = (req, res, next) => {
             "type": "textEmpty"
         }
     };
-    const goSignup = checkFunctions.checkForm(userObjectTest);
-    if (goSignup.valid) {
+    const goUpdate = checkFunctions.checkForm(userObjectTest);
+    if (goUpdate.valid) {
         bdd.promise(queries.update.check, [req.params.currentUserId])
-        .then(result => {
+        .then(async (result) => {
             if (result.length > 0) {
-                if (req.file && `${req.protocol}://${req.get('host')}/images/${req.file.filename}` != result[0].imageUrl) {
-                    const filename = result[0].imageUrl.split('/images/')[1];
-                    if (filename != 'user.png') {
-                        fs.unlink(`images/${filename}`,() => {});
-                    }
-                }
-                const userImageUrl = (req.file) ? `${req.protocol}://${req.get('host')}/images/${req.file.filename}` : result[0].imageUrl;
+                if (req.file && result[0].imageUrl != defaultUserImageUrl) {
+                    const deleteImage = result[0].imageUrl;
+                    const deleteImageId = path.parse(deleteImage.substring(deleteImage.lastIndexOf('/') + 1)).name;
+                    await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);
+                }               
+                const userImageUrl = (req.file) ? await cloud.uploader(req.file) : result[0].imageUrl;
                 bdd.promise(queries.update.update, [userObject.email, userObject.firstName, userObject.lastName, userObject.fonction, userImageUrl, req.params.currentUserId])
                 .then(() => res.status(201).json({ message: "Compte modifié avec succès.", newUrl: userImageUrl }))
                 .catch(error => res.status(500).json({ error }));
@@ -135,7 +138,8 @@ exports.updatePwd = (req, res, next) => {
 exports.deleteUser = (req, res, next) => {
     bdd.promise(queries.delete.check, [req.params.currentUserId, req.body.email])
     .then(result => {
-        let imgToDelete = [result[0].imgProfil];   
+        let imgToDelete = []; 
+        if (result[0].imgProfil != defaultUserImageUrl) {imgToDelete.push(result[0].imgProfil);}
         result.forEach(element => {
             if (req.body.deleteDatas && element.imgPosts != '') {
                 imgToDelete.push(element.imgPosts);
@@ -147,11 +151,9 @@ exports.deleteUser = (req, res, next) => {
                 if (!valid && !req.body.admin) {
                     return res.status(401).json({ message: "Mot de passe incorrect !" });
                 } else {
-                    imgToDelete.forEach(element => {
-                        let filename = element.split('/images/')[1]
-                        if (filename != 'user.png') {
-                            fs.unlink(`images/${filename}`,() => {});
-                        }              
+                    imgToDelete.forEach(async (element) => {
+                        let deleteImageId = path.parse(element.substring(element.lastIndexOf('/') + 1)).name;
+                        await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);          
                     })
                     let query = (req.body.deleteDatas) ? queries.delete.delete.userAndDatas : queries.delete.delete.onlyUser ;
                     let queryMessage = (req.body.admin) ? `Vous venez de supprimer l'utilisateur ${req.body.email}.` : ((req.body.deleteDatas) ? "Votre compte et toutes les publications associées, commentaires et likes ont bien été supprimés. Vous allez être redirigé vers l'accueil." : "Votre compte a bien été supprimé. Vous allez être redirigé vers l'accueil.");

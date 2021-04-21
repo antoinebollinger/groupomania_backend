@@ -10,11 +10,23 @@ cloudinary.config({
 const uploader = (file) => {
     const image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(image, { folder: 'groupomania' }, (err, url) => {
+        cloudinary.uploader.upload(image, { folder: process.env.API_FOLDER, width: 800, quality: "auto", fetch_format: "auto", crop: "scale"}, (err, result) => {
             if (err) return reject(err);
-            return resolve(url.url);
+            return resolve(result.url);
         })
     })
 };
 
-module.exports = uploader;
+const destroyer = (fileUrl) => {
+    return new Promise((resolve, reject) => {
+        cloudinary.uploader.destroy(fileUrl, (err, result) => {
+            if (err) return reject(err);
+            return resolve(result);
+        });
+    })
+}
+
+module.exports = {
+    uploader,
+    destroyer
+};
