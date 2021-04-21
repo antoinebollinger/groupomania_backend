@@ -3,21 +3,34 @@ const queries = require('./bdd.json');
 require('dotenv').config();
 
 // Création de la connection
-const bdd = mysql.createConnection({
+const pool = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
+    database: process.env.DB_DATABASE,
     multipleStatements: true,
-    reconnect: true
-});
-bdd.connect((err) => {
-    if(err) {throw err;}
+    reconnect: true,
+    connectionLimit: 10,
+    waitForConnections : false
 });
 
-// Création d'une fonction Promise
-bdd.promise = (sql, sql_params, erreur) => {
+pool.getConnection((err, connection) => {
+    connection.query("CREATE DATABASE IF NOT EXISTS "+process.env.DB_DATABASE+" /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */", function (err) {
+        if (err) throw err;
+        connection.changeUser({database: process.env.DB_DATABASE}, function(err) {
+            if (err) throw err;
+            for (const table in queries.tables) {
+                connection.query(queries.tables[table], function(err, results) {
+                    if (err) throw err;
+                });
+            }
+        });
+    })
+});
+
+pool.promise = (sql, sql_params, erreur) => {
     return new Promise((resolve, reject) => {
-        bdd.query(sql, sql_params, (err, result) => {
+        pool.query(sql, sql_params, (err, result) => {
             if (err) {
                 reject(err);
             } else {
@@ -27,18 +40,6 @@ bdd.promise = (sql, sql_params, erreur) => {
     });
 };
 
-// Création de la base de données et des tables si elles n'existent pas
-bdd.promise("CREATE DATABASE IF NOT EXISTS "+process.env.DB_DATABASE+" /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci */", [], "Impossible de créer la base de données")
-.then(results => {
-    bdd.changeUser({database: process.env.DB_DATABASE}, function(err) {
-        if (err) throw err;
-        for (const table in queries.tables) {
-            bdd.query(queries.tables[table], function(err, results) {
-                if (err) throw err;
-            });
-        }
-    });
-})
-.catch(error => {throw error;});
+console.log(pool);
 
-module.exports = bdd;
+module.exports = pool;
