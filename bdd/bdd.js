@@ -40,6 +40,4 @@ pool.promise = (sql, sql_params, erreur) => {
     });
 };
 
-console.log(pool);
-
 module.exports = pool;
