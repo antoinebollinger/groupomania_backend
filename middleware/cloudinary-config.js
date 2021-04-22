@@ -7,12 +7,12 @@ cloudinary.config({
     api_secret: process.env.API_SECRET
 })
 
-const uploader = (file) => {
+const uploader = (file, width = 800) => {
     const image = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
     return new Promise((resolve, reject) => {
-        cloudinary.uploader.upload(image, { folder: process.env.API_FOLDER, width: 800, quality: "auto", fetch_format: "auto", crop: "scale"}, (err, result) => {
+        cloudinary.uploader.upload(image, { folder: process.env.API_FOLDER, width: width, quality: "auto", fetch_format: "auto", crop: "scale"}, (err, result) => {
             if (err) return reject(err);
-            return resolve(result.url);
+            return resolve(result.secure_url);
         })
     })
 };

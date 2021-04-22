@@ -33,7 +33,7 @@ exports.signup = (req, res, next) => {
         bdd.promise(queries.signup.check, [userObject.email])
         .then(async (result) => {
             if (result.length === 0) {
-                const userImageUrl = (req.file) ? await cloud.uploader(req.file) : defaultUserImageUrl;
+                const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : defaultUserImageUrl;
                 bcrypt.hash(userObject.password, 10) 
                 .then(async (hash) => {
                     bdd.promise(queries.signup.insert, [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl], "Impossible de créer le compte.")

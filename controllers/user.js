@@ -75,7 +75,7 @@ exports.updateUser = (req, res, next) => {
                     const deleteImageId = path.parse(deleteImage.substring(deleteImage.lastIndexOf('/') + 1)).name;
                     await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);
                 }               
-                const userImageUrl = (req.file) ? await cloud.uploader(req.file) : result[0].imageUrl;
+                const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : result[0].imageUrl;
                 bdd.promise(queries.update.update, [userObject.email, userObject.firstName, userObject.lastName, userObject.fonction, userImageUrl, req.params.currentUserId])
                 .then(() => res.status(201).json({ message: "Compte modifié avec succès.", newUrl: userImageUrl }))
                 .catch(error => res.status(500).json({ error }));
