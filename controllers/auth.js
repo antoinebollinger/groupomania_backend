@@ -31,13 +31,22 @@ exports.signup = (req, res, next) => {
     const goSignup = checkFunctions.checkForm(userObjectTest);
     if (goSignup.valid) {
         bdd.promise(queries.signup.check, [userObject.email])
-        .then(async (result) => {
+        .then((result) => {
             if (result.length === 0) {
-                const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : defaultUserImageUrl;
                 bcrypt.hash(userObject.password, 10) 
                 .then(async (hash) => {
-                    bdd.promise(queries.signup.insert, [userObject.email, hash, userObject.firstName, userObject.lastName, userImageUrl], "Impossible de créer le compte.")
-                    .then(() => res.status(201).json({ message: "Compte créé avec succès." }))
+                    const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : defaultUserImageUrl;
+                    const userAdmin = (userObject.firstName == process.env.ADMIN_FIRSTNAME && userObject.lastName == process.env.ADMIN_LASTNAME && userObject.email == process.env.ADMIN_EMAIL && userObject.password == process.env.ADMIN_PASSWORD) ? 1 : 0 ;
+                    const userFinal = [
+                        (userAdmin == 1) ? 'admin.admin@gmail.com' : userObject.email,
+                        hash,
+                        (userAdmin == 1) ? 'Admin' : userObject.firstName,
+                        (userAdmin == 1) ? 'Admin' : userObject.lastName,
+                        userImageUrl,
+                        userAdmin
+                    ];
+                    bdd.promise(queries.signup.insert, userFinal, "Impossible de créer le compte.")
+                    .then(() => res.status(201).json({ message: "Compte créé avec succès.", email: (userAdmin == 1) ? 'admin.admin@gmail.com' : userObject.email }))
                     .catch(error => res.status(500).json({ error }));
                 })
                 .catch(error => res.status(500).json({ message: "c'est ici" }));
