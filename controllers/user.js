@@ -6,7 +6,6 @@ const path = require('path');
 
 //cloudinary
 const cloud = require('../middleware/cloudinary-config');
-const defaultUserImageUrl = "https://res.cloudinary.com/hbmi6hrw8/image/upload/v1618988246/groupomania/user_iqjqqb.png";
 
 exports.getOneUser = (req, res, next) => {
     bdd.promise(queries.getOne, [req.params.userId], "Impossible d'afficher l'utilisateur demandé.")
@@ -70,7 +69,7 @@ exports.updateUser = (req, res, next) => {
         bdd.promise(queries.update.check, [req.params.currentUserId])
         .then(async (result) => {
             if (result.length > 0) {
-                if (req.file && result[0].imageUrl != defaultUserImageUrl) {
+                if (req.file && result[0].imageUrl != process.env.API_DEFAULT_IMAGE) {
                     const deleteImage = result[0].imageUrl;
                     const deleteImageId = path.parse(deleteImage.substring(deleteImage.lastIndexOf('/') + 1)).name;
                     await cloud.destroyer(process.env.API_FOLDER+'/'+deleteImageId);
@@ -139,7 +138,7 @@ exports.deleteUser = (req, res, next) => {
     bdd.promise(queries.delete.check, [req.params.currentUserId, req.body.email])
     .then(result => {
         let imgToDelete = []; 
-        if (result[0].imgProfil != defaultUserImageUrl) {imgToDelete.push(result[0].imgProfil);}
+        if (result[0].imgProfil != process.env.API_DEFAULT_IMAGE) {imgToDelete.push(result[0].imgProfil);}
         result.forEach(element => {
             if (req.body.deleteDatas && element.imgPosts != '') {
                 imgToDelete.push(element.imgPosts);

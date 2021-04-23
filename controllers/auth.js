@@ -1,4 +1,5 @@
 const bdd = require("../bdd/bdd");
+const bddQueries = require('../bdd/bdd.json');
 const queries = require('../queries/auth.json');
 const checkFunctions = require("../middleware/functions");
 const bcrypt = require('bcrypt');
@@ -6,7 +7,6 @@ const jwt = require('jsonwebtoken');
 
 //cloudinary
 const cloud = require('../middleware/cloudinary-config');
-const defaultUserImageUrl = "https://res.cloudinary.com/hbmi6hrw8/image/upload/v1618988246/groupomania/user_iqjqqb.png";
 
 exports.signup = (req, res, next) => {
     const userObject = JSON.parse(req.body.user);
@@ -35,7 +35,7 @@ exports.signup = (req, res, next) => {
             if (result.length === 0) {
                 bcrypt.hash(userObject.password, 10) 
                 .then(async (hash) => {
-                    const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : defaultUserImageUrl;
+                    const userImageUrl = (req.file) ? await cloud.uploader(req.file, 200) : process.env.API_DEFAULT_IMAGE;
                     const userAdmin = (userObject.firstName == process.env.ADMIN_FIRSTNAME && userObject.lastName == process.env.ADMIN_LASTNAME && userObject.email == process.env.ADMIN_EMAIL && userObject.password == process.env.ADMIN_PASSWORD) ? 1 : 0 ;
                     const userFinal = [
                         (userAdmin == 1) ? 'admin.admin@gmail.com' : userObject.email,
@@ -111,3 +111,10 @@ exports.login = (req, res, next) => {
 exports.logout = (req, res, next) => {
     return res.status(200).json({ message: "Vous allez être déconnecté et redirigé vers la page d'accueil."});
 };
+
+exports.reinitializing = (req, res, next) => {
+    for (const table in bddQueries.tables) {
+        console.log(`TRUNCATE TABLE ${table}`);
+    }
+
+}

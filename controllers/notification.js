@@ -30,3 +30,9 @@ exports.activeNotif = (req, res, next) => {
     .then(() => res.status(201).json({ message: "La notification a bien été activée." }))
     .catch(error => res.status(400).json({ error }));
 };
+
+exports.deleteNotif = (req, res, next) => {
+    bdd.promise(queries.deleteAll, [], "Impossible de supprimer les notifications.")
+    .then(() => res.status(201).json({ message: "Les notifications ont bien été supprimées." }))
+    .catch(error => res.status(400).json({ error }));
+};
